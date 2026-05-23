@@ -1,6 +1,19 @@
 import * as InventoryModel from '../models/inventoryModel.js'
 import { v4 as uuidv4 } from 'uuid'
 
+export const fetchItems = async (req, res) => {
+  try {
+    const items = await InventoryModel.getItems()
+    res.status(200).json({ success: true, message: items })
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 export const createItem = async (req, res) => {
   const { name, category, price, quantity } = req.body
   try {

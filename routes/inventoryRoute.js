@@ -6,6 +6,7 @@ const inventoryRoutes = express.Router()
 
 inventoryRoutes.use(CheckToken)
 
+inventoryRoutes.get('/all', InventoryController.fetchItems)
 inventoryRoutes.post('/new', InventoryController.createItem)
 inventoryRoutes.put('/edit/:id', InventoryController.editItem)
 inventoryRoutes.delete('/delete/:id', InventoryController.deleteItem)
