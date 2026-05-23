@@ -11,6 +11,13 @@ export const insertItem = async (name, category, price, quantity) => {
     [name, category, price, quantity]
   )
 
+  await pool.query(
+    `INSERT INTO inventoryhistorytable
+    (name, movement, newstocks)
+    VALUES (?, ?, ?)`,
+    [name, +${quantity}, quantity]
+  )
+
   return result.insertId
 }
 
@@ -31,6 +38,23 @@ export const updateItem = async (name, category, price, quantity, id) => {
     [name, category, price, quantity, id]
   )
 
+  let movement = 0
+
+  if (quantity > oldQuantity) {
+    movement = +${quantity - oldQuantity}
+  } else if (quantity < oldQuantity) {
+    movement = -${oldQuantity - quantity}
+  } else {
+    movement = '0'
+  }
+
+  await pool.query(
+    `INSERT INTO inventoryhistorytable
+    (name, movement, newstocks)
+    VALUES (?, ?, ?)`,
+    [name, movement, quantity]
+  )
+
   return result.affectedRows
 }
 
@@ -48,6 +72,13 @@ export const deleteItem = async id => {
   const [result] = await pool.query('DELETE FROM inventorytable WHERE id= ?', [
     id
   ])
+
+  await pool.query(
+    `INSERT INTO inventoryhistorytable
+    (name, movement, newstocks)
+    VALUES (?, ?, ?)`,
+    [item.name, -${item.quantity}, 0]
+  )
 
   return result.affectedRows
 }
@@ -107,6 +138,13 @@ export const orderItem = async (quantity, id, orderid) => {
   if (!shipmentResponse.ok) {
     throw new Error('Failed to create shipment record')
   }
+
+  await pool.query(
+    `INSERT INTO inventoryhistorytable
+    (name, movement, newstocks)
+    VALUES (?, ?, ?)`,
+    [item.name, -${quantity}, newQuantity]
+  )
 
   return {
     success: true

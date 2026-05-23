@@ -11,4 +11,6 @@ inventoryRoutes.post('/new', InventoryController.createItem)
 inventoryRoutes.put('/edit/:id', InventoryController.editItem)
 inventoryRoutes.delete('/delete/:id', InventoryController.deleteItem)
 
+inventoryRoutes.post('/order/:id', InventoryController.orderItem)
+
 export default inventoryRoutes
