@@ -51,3 +51,64 @@ export const deleteItem = async id => {
 
   return result.affectedRows
 }
+
+export const orderItem = async (quantity, id, orderid) => {
+  const [rows] = await pool.query(
+    'SELECT name, quantity FROM inventorytable WHERE id = ?',
+    [id]
+  )
+
+  if (rows.length === 0) {
+    return {
+      success: false,
+      message: 'Item not found'
+    }
+  }
+
+  const item = rows[0]
+  const currentStock = item.quantity
+
+  if (currentStock === 0) {
+    return {
+      success: false,
+      message: 'No stocks available'
+    }
+  }
+
+  if (quantity > currentStock) {
+    return {
+      success: false,
+      message: 'Insufficient stock'
+    }
+  }
+
+  const newQuantity = currentStock - quantity
+
+  await pool.query('UPDATE inventorytable SET quantity = ? WHERE id = ?', [
+    newQuantity,
+    id
+  ])
+
+  const shipmentResponse = await fetch(
+    'https://logistics-and-tracking-delivery-system.onrender.com/api/shipments',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        orderid,
+        name: item.name,
+        quantity
+      })
+    }
+  )
+
+  if (!shipmentResponse.ok) {
+    throw new Error('Failed to create shipment record')
+  }
+
+  return {
+    success: true
+  }
+}
