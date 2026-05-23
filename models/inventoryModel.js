@@ -1,10 +1,16 @@
 import pool from './db.js'
 
+export const getItems = async () => {
+  const [rows] = await pool.query('SELECT * FROM inventorytable')
+  return rows
+}
+
 export const insertItem = async (name, category, price, quantity) => {
   const [result] = await pool.query(
     'INSERT INTO inventorytable (name, category, price, quantity) VALUES(?,?,?,?)',
     [name, category, price, quantity]
   )
+
   return result.insertId
 }
 
