@@ -58,3 +58,31 @@ export const deleteItem = async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal Server Error' })
   }
 }
+
+export const orderItem = async (req, res) => {
+  const { quantity } = req.body
+  const { id } = req.params
+
+  const orderid = uuidv4()
+
+  try {
+    const result = await InventoryModel.orderItem(quantity, id, orderid)
+
+    if (!result.success) {
+      return res.status(400).json(result)
+    }
+
+    res.status(200).json({
+      success: true,
+      orderid,
+      message: 'Order successful'
+    })
+  } catch (e) {
+    console.log(e)
+
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+}

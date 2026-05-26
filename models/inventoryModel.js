@@ -15,7 +15,7 @@ export const insertItem = async (name, category, price, quantity) => {
     `INSERT INTO inventoryhistorytable
     (name, movement, newstocks)
     VALUES (?, ?, ?)`,
-    [name, +${quantity}, quantity]
+    [name, `+${quantity}`, quantity]
   )
 
   return result.insertId
@@ -41,9 +41,9 @@ export const updateItem = async (name, category, price, quantity, id) => {
   let movement = 0
 
   if (quantity > oldQuantity) {
-    movement = +${quantity - oldQuantity}
+    movement = `+${quantity - oldQuantity}`
   } else if (quantity < oldQuantity) {
-    movement = -${oldQuantity - quantity}
+    movement = `-${oldQuantity - quantity}`
   } else {
     movement = '0'
   }
@@ -77,7 +77,7 @@ export const deleteItem = async id => {
     `INSERT INTO inventoryhistorytable
     (name, movement, newstocks)
     VALUES (?, ?, ?)`,
-    [item.name, -${item.quantity}, 0]
+    [item.name, `-${item.quantity}`, 0]
   )
 
   return result.affectedRows
@@ -143,7 +143,7 @@ export const orderItem = async (quantity, id, orderid) => {
     `INSERT INTO inventoryhistorytable
     (name, movement, newstocks)
     VALUES (?, ?, ?)`,
-    [item.name, -${quantity}, newQuantity]
+    [item.name, `-${quantity}`, newQuantity]
   )
 
   return {
